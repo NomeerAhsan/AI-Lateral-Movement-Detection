@@ -1,0 +1,5 @@
+user,time_window,action_count,unique_hosts,suspicious_process_count
+ali,2025-11-16 09:00:00,2,1,1
+ali,2025-11-16 09:10:00,2,1,1
+sara,2025-11-16 09:10:00,1,1,0
+sara,2025-11-16 09:20:00,1,1,1

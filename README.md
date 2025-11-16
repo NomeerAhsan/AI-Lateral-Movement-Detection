@@ -64,3 +64,33 @@ inputs -- data/processed/clean_logs.csv
 outputs -- data/alerts/alerts.csv
 step 3:
 run script from main folder.
+
+Phase 1: ML-Based Detection
+
+Machine learning :
+Train a machine learning model to detect anomalous user behavior, like lateral movement or suspicious logins, wihtout hard-coded rules.
+
+Using Isolation forest -- detects outliers in high-dimensional data; good for logs
+
+Feature Engineering: selecting most revelant features(individual measurable properties that model uses as input to make predictions) from the data and craeting new ones to improve model's performance.
+
+Data Splitting: Dividing the dataset into training, validation, and testing sets.
+
+Model Training: Choosing an algorithm and training it on the prepared data.
+
+Model Evaluation: Testing the trained model's performance using metrics like accuracy, precision, and recall to see how well it generalizes.
+
+Model Deployment: Making the final model available to be used in a production environment, often through an API or cloud service.
+
+Model Maintenance: Continuously monitoring and updating the model after deployment to ensure it remains effective.
+
+Step 1: Feature Engineering
+Step 2: Labeling
+Step 3: Choosing an ML Model
+Step 4: ML pipeline
+Read data/processed/clean_logs.csv
+Generate features per user per time window
+Fit the model (Isolation Forest) on normal/synthetic data
+Predict anomalies → output alerts
+Save alerts to data/alerts/ml_alerts.csv
+Step 5: Output
