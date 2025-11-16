@@ -1,0 +1,42 @@
+Example Workflow - Credential Theft & Lateral Movement Detection System
+
+1. Credential Theft (Initial Compromise)
+- Attacker steals Ali’s password via phishing.
+- Logs: Azure AD login, VPN login, unusual IP, abnormal geolocation.
+System Action:
+- Flags “Credential Misuse Risk”.
+Alert 1: Suspicious Login Detected.
+
+2. Attacker Tries Lateral Movement
+- SMB access to Finance Server
+- WMI commands to HR-PC
+- RDP to Engineering Server
+System Action:
+- Graph model detects unusual access to new devices.
+Alert 2: Possible Lateral Movement Attempt.
+
+3. ML Model Validates Abnormal Behavior
+Normal Ali:
+- Uses only email + ERP, 1–2 devices.
+Attack behavior:
+- 6 devices, share enumeration, remote PowerShell.
+ML Score: 0.98 anomaly.
+Alert 3: Confirmed Abnormal Behavior.
+
+4. Dark-Web Exposure Check
+- Ali’s email found in breach database.
+- Risk score increased.
+
+5. Automated Containment (SOAR)
+- Disable Ali’s account
+- Kill sessions
+- Block attacker IP
+Alert: User Ali Disabled Automatically.
+
+6. SOC Analyst Review
+Attack Timeline:
+1. 02:14 – Suspicious login
+2. 02:17 – SMB enumeration
+3. 02:22 – WMI execution
+4. 02:26 – RDP attempt
+5. 02:27 – Automated isolation triggered

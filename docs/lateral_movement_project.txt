@@ -1,0 +1,154 @@
+AI-Based Early Lateral Movement Detection System
+
+Project Documentation (Full Version)
+
+1. Project Summary
+
+Build an AI-driven system that analyzes authentication logs, process
+events, and network telemetry to detect early stages of lateral movement
+inside enterprise networks. Uses rule-based detection + anomaly models +
+graph ML (GNNs) to detect attacks before they escalate.
+
+2. Problem Statement
+
+Lateral movement is usually detected late, often after attackers obtain
+privileged access and compromise critical systems. Traditional detection
+systems generate noisy alerts without context.
+
+Goal: Identify early indicators of lateral movement through AI models
+and graph-based behavior analysis.
+
+3. Data Sources
+
+-   Windows Event Logs (4624, 4625, 4688, 4672, etc.)
+-   Sysmon logs
+-   Linux authentication logs
+-   NetFlow, Zeek network logs
+-   EDR telemetry
+-   AD user/group data
+-   Host baseline info
+-   Threat intelligence indicators
+
+4. Feature Engineering
+
+A. Identity Features
+
+-   Login time anomalies
+-   Failed → success login patterns
+-   New host access frequency
+-   Number of unique IPs per user
+-   Password spray patterns
+
+B. Host Features
+
+-   Remote service creation
+-   SMB share access anomalies
+-   Outbound connection spikes
+-   Unusual process creation
+
+C. Graph Features
+
+-   User-host bipartite graph
+-   PageRank, centrality, anomaly scores
+-   Time-decayed edges
+-   Shortest path to critical assets
+
+D. Sequence Features
+
+-   Event sequence embeddings (LSTM/Transformer)
+
+5. Detection Approach
+
+1. Rule-Based Detection
+
+Detects known techniques (WMI, PSExec, SMB anomalies, admin share
+usage).
+
+2. Unsupervised ML
+
+-   IsolationForest
+-   Autoencoders
+-   One-Class SVM
+
+3. Graph Neural Networks
+
+Predict risky nodes/edges using temporal graph data.
+
+4. Sequence Models
+
+Detect suspicious event sequences per account.
+
+5. Ensemble Detection
+
+Combines scores → final risk score.
+
+6. Architecture
+
+1.  Log ingestion (Elastic, Splunk, Sentinel, Kafka)
+2.  Storage (ClickHouse, Elastic, Neo4j)
+3.  Feature engineering pipeline
+4.  ML models (PyTorch, PyG)
+5.  Real-time scoring API
+6.  SIEM/SOAR integration
+
+7. Training Data
+
+-   Red-team simulations (Atomic Red Team, CALDERA)
+-   Open datasets (LANL auth dataset)
+-   Synthetic attack injections
+-   Historical EDR logs
+-   Honeypot attack data
+
+8. Evaluation Metrics
+
+-   Precision, Recall, F1
+-   ROC-AUC, PR-AUC
+-   MTTD (Mean Time to Detect)
+-   Alert volume per day
+-   SOC actionability ratio
+
+9. Threat Hunting Rules (Examples)
+
+-   New access to admin shares (C$)
+-   PSExec/WMI execution from low-privileged accounts
+-   Failed login bursts then success
+-   Abnormal SMB file reads
+-   New scheduled tasks + remote connections
+
+10. Implementation Plan
+
+Phase 0 (2 weeks)
+
+-   Ingest logs
+-   Implement rule-based detection
+-   Build basic user→host graph
+
+Phase 1 (4 weeks)
+
+-   Feature engineering
+-   Train IsolationForest
+-   Evaluate using red-team datasets
+
+Phase 2 (6–8 weeks)
+
+-   Build GNN graph model
+-   Deploy scoring microservice
+
+Phase 3 (ongoing)
+
+-   Integrate SOAR playbooks
+-   Test on simulated attacks
+
+11. Limitations
+
+-   Scarce labeled data → compensate with unsupervised models
+-   High FP risk → feedback loop needed
+-   Scaling GNN models can be heavy → use offline scoring
+
+12. Tools
+
+-   ELK, Splunk, Sentinel
+-   Kafka, Spark
+-   PyTorch, PyG
+-   Neo4j
+-   Atomic Red Team, CALDERA
