@@ -1,0 +1,7 @@
+time_window,timestamp,user,host,alert_type,details,source
+2025-11-16 09:00:00,2025-11-16 09:05:00,ali,host001,Remote process creation,User ran powershell.exe: Invoke-Command,Rule-based
+2025-11-16 09:10:00,2025-11-16 09:10:00,sara,,ML anomaly,"{'action_count': 1, 'unique_hosts': 1, 'suspicious_process_count': 0, 'anomaly_score': -0.0576198989350698, 'num_source_ips': 1, 'num_unique_commands': 0, 'outside_work_hours': 0}",ML
+2025-11-16 09:10:00,2025-11-16 09:10:00,ali,finance01,Multiple hosts in short time,User accessed hosts {'host001'} within 10 minutes,Rule-based
+2025-11-16 09:10:00,2025-11-16 09:12:00,ali,finance01,Remote process creation,User ran cmd.exe: net use F$ \srv,Rule-based
+2025-11-16 09:20:00,2025-11-16 09:20:00,sara,hr01,Multiple hosts in short time,User accessed hosts {'host002'} within 10 minutes,Rule-based
+2025-11-16 09:20:00,2025-11-16 09:20:00,sara,hr01,Remote process creation,User ran powershell.exe: Get-Process,Rule-based

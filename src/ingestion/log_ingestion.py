@@ -6,8 +6,8 @@ from glob import glob
 # Define paths using BASE_PATH
 # Without using base path we can get path issues when running from different locations
 # -------------------------------
-# BASE_PATH = project root folder
-BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# BASE_PATH = project root folder (go up 3 levels from src/ingestion/log_ingestion.py)
+BASE_PATH = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 RAW_PATH = os.path.join(BASE_PATH, "data", "raw")
 PROCESSED_PATH = os.path.join(BASE_PATH, "data", "processed")
@@ -29,8 +29,8 @@ dfs = []
 for file in csv_files:
     df = pd.read_csv(file)
 
-    # Convert timestamp to datetime
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    # Convert timestamp to datetime (handle multiple formats)
+    df['timestamp'] = pd.to_datetime(df['timestamp'], dayfirst=True, errors='coerce')
 
     # Keep only required columns
     df = df[['timestamp', 'user', 'host', 'event_id', 'process_name', 'command_line', 'source_ip']]

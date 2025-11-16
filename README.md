@@ -1,96 +1,277 @@
 # AI-Lateral-Movement-Detection
 
-AI-powered lateral movement detection system for early threat detection
+AI-powered lateral movement detection system for early threat detection using both rule-based and machine learning approaches.
 
-Phase 0: Step 1 — Understanding Log Ingestion
+## Overview
 
-Log ingestion is the process of collecting, normalizing, and storing logs from different systems so they can be analyzed.
+This project implements a comprehensive lateral movement detection system that:
+- Ingests and normalizes security logs
+- Extracts behavioral features from user activity
+- Detects anomalies using both rule-based and ML-based methods
+- Merges and visualizes alerts for security analysis
 
-Sources:
-⦁ Windows Event Logs (4624: login success, 4625: login failure, 4688: process created, etc.)
-⦁ Sysmon (process creation, network connections)
-⦁ Linux authentication logs (SSH, sudo)
-⦁ Network devices / NetFlow / Zeek
-⦁ EDR agents (endpoint telemetry)
-⦁ Active Directory metadata (users, groups, lastLogonTime)
+## Project Structure
 
-Using fake logs for training the model then once its completed we will use real logs.
+```
+AI-Lateral-Movement-Detection/
+├── data/
+│   ├── raw/                    # Raw synthetic logs
+│   ├── processed/              # Cleaned and normalized logs
+│   ├── features/               # Feature engineering output
+│   └── alerts/                 # Detection alerts
+│       └── visualizations/     # Generated charts and graphs
+├── src/
+│   ├── ingestion/              # Log ingestion scripts
+│   ├── ml/                     # Feature engineering
+│   ├── detection/              # Detection algorithms
+│   │   ├── rule_based_detection.py
+│   │   ├── ml_detection.py
+│   │   └── merge_alerts.py
+│   └── utils/                  # Utility scripts
+│       └── visualize_alerts.py
+├── notebooks/                  # Jupyter notebooks (optional)
+├── docs/                       # Project documentation
+├── tests/                      # Unit tests
+├── run_pipeline.py             # End-to-end pipeline script
+└── requirements.txt            # Python dependencies
+```
 
-Python Log Ingestion Script Plan
+## Features
 
-Input: data/raw/\*.csv or .json (synthetic logs)
+### Detection Methods
 
-Steps in the script:
+1. **Rule-Based Detection** (`rule_based_detection.py`)
+   - Multiple hosts accessed in short time (10 minutes)
+   - Login outside working hours (00:00-06:00)
+   - Remote process creation (powershell.exe, cmd.exe)
+   - Sensitive host access by uncommon users
 
-1.Read all raw log files
-2.Convert timestamps to consistent format
-3.Extract necessary fields:
+2. **ML-Based Detection** (`ml_detection.py`)
+   - Uses Isolation Forest algorithm
+   - Detects anomalies based on behavioral patterns
+   - Enhanced with 6 features for better detection
 
-timestamp, user, host, event_id, process_name, command_line, source_ip
+### Feature Engineering
 
-4.Add optional enrichment (host criticality, AD group membership)
-5.Save processed logs to data/processed/clean_logs.csv
+The system extracts the following features per user per 10-minute time window:
 
-Output: Clean CSV ready for feature engineering.
+1. **action_count**: Total number of actions/events
+2. **unique_hosts**: Number of unique hosts accessed
+3. **suspicious_process_count**: Count of suspicious processes executed
+4. **num_source_ips**: Number of unique source IPs
+5. **num_unique_commands**: Number of unique commands executed
+6. **outside_work_hours**: Binary indicator (1 if activity outside 06:00-18:00)
 
-step 1:
-Create synthetic log file using excel and saving it as csv file into /data/raw folder.
+## Installation
 
-step 2:
-create python ingestion script "src/ingestion/log_ingestion.py"
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd AI-Lateral-Movement-Detection
+```
 
-The script will:
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-1.Read CSV files from data/raw/
-2.Normalize timestamps to datetime objects
-3.Select required columns for the pipeline
-4.Save clean data to data/processed/clean_logs.csv
+Required packages:
+- pandas
+- numpy
+- scikit-learn
+- matplotlib
+- networkx (for future graph-based features)
 
-Phase 0: Step 2 - First Rule-Based Detection System.
+## Usage
 
-What is Rule-Based Detection?
-Using hard coded rules to detect suspicous activity.
+### Quick Start - Run Complete Pipeline
 
-Example rule:
-Suspicous login outside working hours.
-Multiple logins to different hosts in short time (idicates lateral movement possibility)
-Remote process creation (powershell.exe)
-Access to sensitive hosts by uncommon users. ( HR server accessed by finance user)
+Run the end-to-end pipeline:
+```bash
+python run_pipeline.py
+```
 
-Step 1:
-Create a new script into "src/detection/rule_based_detection.py"
-Step 2:
-inputs -- data/processed/clean_logs.csv
-outputs -- data/alerts/alerts.csv
-step 3:
-run script from main folder.
+This will execute:
+1. Feature Engineering
+2. ML Detection
+3. Rule-Based Detection (if not already done)
+4. Merge Alerts
 
-Phase 1: ML-Based Detection
+### Step-by-Step Execution
 
-Machine learning :
-Train a machine learning model to detect anomalous user behavior, like lateral movement or suspicious logins, wihtout hard-coded rules.
+#### 1. Log Ingestion
+```bash
+python src/ingestion/log_ingestion.py
+```
+- Input: `data/raw/synthetic_logs.csv`
+- Output: `data/processed/clean_logs.csv`
+- Normalizes timestamps and extracts relevant fields
 
-Using Isolation forest -- detects outliers in high-dimensional data; good for logs
+#### 2. Feature Engineering
+```bash
+python src/ml/feature_engineering.py
+```
+- Input: `data/processed/clean_logs.csv`
+- Output: `data/features/feature_table.csv`
+- Generates 6 features per user per 10-minute window
 
-Feature Engineering: selecting most revelant features(individual measurable properties that model uses as input to make predictions) from the data and craeting new ones to improve model's performance.
+#### 3. ML Detection
+```bash
+python src/detection/ml_detection.py
+```
+- Input: `data/features/feature_table.csv`
+- Output: `data/alerts/ml_alerts.csv`
+- Trains Isolation Forest and generates anomaly alerts
 
-Data Splitting: Dividing the dataset into training, validation, and testing sets.
+#### 4. Rule-Based Detection
+```bash
+python src/detection/rule_based_detection.py
+```
+- Input: `data/processed/clean_logs.csv`
+- Output: `data/alerts/alerts.csv`
+- Applies hard-coded rules for known attack patterns
 
-Model Training: Choosing an algorithm and training it on the prepared data.
+#### 5. Merge Alerts
+```bash
+python src/detection/merge_alerts.py
+```
+- Input: `data/alerts/ml_alerts.csv` + `data/alerts/alerts.csv`
+- Output: `data/alerts/all_alerts.csv`
+- Combines and sorts all alerts by time window
 
-Model Evaluation: Testing the trained model's performance using metrics like accuracy, precision, and recall to see how well it generalizes.
+#### 6. Visualize Alerts
+```bash
+python src/utils/visualize_alerts.py
+```
+- Input: `data/alerts/all_alerts.csv`
+- Output: `data/alerts/visualizations/*.png`
+- Generates 6 visualization charts:
+  - Alerts per user
+  - Alerts per host
+  - Alerts over time
+  - Alert type distribution
+  - ML vs Rule-based comparison
+  - User activity timeline
 
-Model Deployment: Making the final model available to be used in a production environment, often through an API or cloud service.
+## Output Files
 
-Model Maintenance: Continuously monitoring and updating the model after deployment to ensure it remains effective.
+### Data Files
+- `data/processed/clean_logs.csv`: Normalized log data
+- `data/features/feature_table.csv`: Engineered features
+- `data/alerts/ml_alerts.csv`: ML-based anomaly alerts
+- `data/alerts/alerts.csv`: Rule-based alerts
+- `data/alerts/all_alerts.csv`: Merged alerts (sorted by time)
 
-Step 1: Feature Engineering
-Step 2: Labeling
-Step 3: Choosing an ML Model
-Step 4: ML pipeline
-Read data/processed/clean_logs.csv
-Generate features per user per time window
-Fit the model (Isolation Forest) on normal/synthetic data
-Predict anomalies → output alerts
-Save alerts to data/alerts/ml_alerts.csv
-Step 5: Output
+### Visualizations
+All charts are saved in `data/alerts/visualizations/`:
+- `alerts_per_user.png`
+- `alerts_per_host.png`
+- `alerts_over_time.png`
+- `alert_type_distribution.png`
+- `ml_vs_rule_based.png`
+- `user_activity_timeline.png`
+
+## Detection Rules
+
+### Rule-Based Detection
+
+1. **Multiple Hosts in Short Time**
+   - Triggers when a user accesses different hosts within 10 minutes
+   - Indicates potential lateral movement
+
+2. **Login Outside Working Hours**
+   - Detects logins between 00:00-06:00
+   - Unusual activity pattern
+
+3. **Remote Process Creation**
+   - Flags execution of suspicious processes:
+     - powershell.exe
+     - cmd.exe
+   - Common in lateral movement attacks
+
+4. **Sensitive Host Access**
+   - Detects access to sensitive hosts by unauthorized users
+   - Example: Finance user accessing HR servers
+
+### ML-Based Detection
+
+- Uses **Isolation Forest** algorithm
+- Contamination rate: 15% (configurable)
+- Detects anomalies based on:
+  - Unusual action patterns
+  - Abnormal host access patterns
+  - Suspicious process execution frequency
+  - Multiple source IPs
+  - Command diversity
+  - Off-hours activity
+
+## Example Output
+
+```
+Total Alerts: 6
+
+By User:
+ali     3
+sara    3
+
+By Alert Type:
+Remote process creation         3
+Multiple hosts in short time    2
+ML anomaly                      1
+
+By Detection Method:
+Rule-based    5
+ML            1
+```
+
+## Configuration
+
+### ML Model Parameters
+Edit `src/detection/ml_detection.py`:
+- `contamination=0.15`: Expected proportion of anomalies
+- `random_state=42`: For reproducibility
+
+### Time Window
+Edit `src/ml/feature_engineering.py`:
+- Default: 10-minute windows (`dt.floor("10min")`)
+- Adjust based on your log volume and analysis needs
+
+### Work Hours
+Edit `src/ml/feature_engineering.py`:
+- Default: 06:00-18:00
+- Outside hours: 00:00-06:00 and 18:00-23:59
+
+## Future Enhancements
+
+- [ ] Graph-based detection using networkx
+- [ ] Real-time log streaming
+- [ ] Alert prioritization and scoring
+- [ ] Integration with SIEM systems
+- [ ] User behavior profiling
+- [ ] Automated response actions
+- [ ] Model retraining pipeline
+- [ ] Performance metrics dashboard
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## License
+
+[Add your license here]
+
+## Acknowledgments
+
+- Isolation Forest algorithm from scikit-learn
+- Synthetic log generation for testing
+
+## Contact
+
+[Add contact information]
+
+---
+
+**Note**: This system currently uses synthetic logs for development and testing. Replace with real log data for production use.

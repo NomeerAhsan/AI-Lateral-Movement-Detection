@@ -1,2 +1,2 @@
 time_window,user,alert_type,details
-2025-11-16 09:10:00,sara,ML anomaly,"{'action_count': 1, 'unique_hosts': 1, 'suspicious_process_count': 0, 'anomaly_score': -0.038110138048110476}"
+2025-11-16 09:10:00,sara,ML anomaly,"{'action_count': 1, 'unique_hosts': 1, 'suspicious_process_count': 0, 'anomaly_score': -0.0576198989350698, 'num_source_ips': 1, 'num_unique_commands': 0, 'outside_work_hours': 0}"

@@ -6,18 +6,52 @@ from sklearn.ensemble import IsolationForest
 # -----------------------
 # Paths
 # -----------------------
-FEATURE_CSV = "data/features/feature_table.csv"
+FEATURE_DIR = "data/features"
+FEATURE_CSV = os.path.join(FEATURE_DIR, "feature_table.csv")
 ALERT_DIR = "data/alerts"
 ALERT_FILE = os.path.join(ALERT_DIR, "ml_alerts.csv")
 os.makedirs(ALERT_DIR, exist_ok=True)
 
+# Auto-detect feature table file (check for backup if main file doesn't have required columns)
 print("[+] Loading feature table...")
-df = pd.read_csv(FEATURE_CSV)
+if os.path.exists(FEATURE_CSV):
+    df = pd.read_csv(FEATURE_CSV)
+    # Check if it has the new columns
+    required_cols = ["num_source_ips", "num_unique_commands", "outside_work_hours"]
+    if not all(col in df.columns for col in required_cols):
+        # Look for backup file
+        import glob
+        backup_files = glob.glob(os.path.join(FEATURE_DIR, "feature_table_backup_*.csv"))
+        if backup_files:
+            # Use most recent backup
+            latest_backup = max(backup_files, key=os.path.getmtime)
+            print(f"[+] Using backup file: {latest_backup}")
+            df = pd.read_csv(latest_backup)
+        else:
+            print("[!] Warning: Feature table missing new columns, but no backup found")
+else:
+    # Look for backup file
+    import glob
+    backup_files = glob.glob(os.path.join(FEATURE_DIR, "feature_table_backup_*.csv"))
+    if backup_files:
+        latest_backup = max(backup_files, key=os.path.getmtime)
+        print(f"[+] Using backup file: {latest_backup}")
+        df = pd.read_csv(latest_backup)
+    else:
+        raise FileNotFoundError(f"Feature table not found: {FEATURE_CSV}")
 
 # -----------------------
 # Select numeric columns for ML
 # -----------------------
-numeric_cols = ["action_count", "unique_hosts", "suspicious_process_count"]
+# Base columns (always present)
+base_cols = ["action_count", "unique_hosts", "suspicious_process_count"]
+# Enhanced columns (may be missing in old feature tables)
+enhanced_cols = ["num_source_ips", "num_unique_commands", "outside_work_hours"]
+
+# Use only columns that exist
+numeric_cols = [col for col in base_cols + enhanced_cols if col in df.columns]
+print(f"[+] Using features: {numeric_cols}")
+
 X = df[numeric_cols].values
 
 print("[+] Training Isolation Forest model...")
@@ -41,6 +75,13 @@ if not anoms.empty:
             "suspicious_process_count": int(r["suspicious_process_count"]),
             "anomaly_score": float(r["anomaly_score"])
         }
+        # Add enhanced features if available
+        if "num_source_ips" in r:
+            details["num_source_ips"] = int(r["num_source_ips"])
+        if "num_unique_commands" in r:
+            details["num_unique_commands"] = int(r["num_unique_commands"])
+        if "outside_work_hours" in r:
+            details["outside_work_hours"] = int(r["outside_work_hours"])
         alerts.append({
             "time_window": r["time_window"],
             "user": r["user"],
@@ -55,5 +96,5 @@ else:
 # Save alerts
 # -----------------------
 alerts_df.to_csv(ALERT_FILE, index=False)
-print(f"[✓] ML alerts saved to {ALERT_FILE}")
-print(f"[✓] Number of ML alerts: {len(alerts_df)}")
+print(f"[OK] ML alerts saved to {ALERT_FILE}")
+print(f"[OK] Number of ML alerts: {len(alerts_df)}")
