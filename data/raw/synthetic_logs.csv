@@ -1,0 +1,7 @@
+﻿timestamp,user,host,event_id,process_name,command_line,source_ip
+16/11/2025 9:00,ali,host001,4624,explorer.exe,-,10.0.0.5
+16/11/2025 9:05,ali,host001,4688,powershell.exe,Invoke-Command,10.0.0.5
+16/11/2025 9:10,ali,finance01,4624,-,-,10.0.0.5
+16/11/2025 9:12,ali,finance01,4688,cmd.exe,net use F$ \srv,10.0.0.5
+16/11/2025 9:15,sara,host002,4624,explorer.exe,-,10.0.0.8
+16/11/2025 9:20,sara,hr01,4688,powershell.exe,Get-Process,10.0.0.8

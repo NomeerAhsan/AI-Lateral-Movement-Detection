@@ -1,2 +1,47 @@
 # AI-Lateral-Movement-Detection
+
 AI-powered lateral movement detection system for early threat detection
+
+Phase 0: Step 1 — Understanding Log Ingestion
+
+Log ingestion is the process of collecting, normalizing, and storing logs from different systems so they can be analyzed.
+
+Sources:
+⦁ Windows Event Logs (4624: login success, 4625: login failure, 4688: process created, etc.)
+⦁ Sysmon (process creation, network connections)
+⦁ Linux authentication logs (SSH, sudo)
+⦁ Network devices / NetFlow / Zeek
+⦁ EDR agents (endpoint telemetry)
+⦁ Active Directory metadata (users, groups, lastLogonTime)
+
+Using fake logs for training the model then once its completed we will use real logs.
+
+Python Log Ingestion Script Plan
+
+Input: data/raw/\*.csv or .json (synthetic logs)
+
+Steps in the script:
+
+1.Read all raw log files
+2.Convert timestamps to consistent format
+3.Extract necessary fields:
+
+timestamp, user, host, event_id, process_name, command_line, source_ip
+
+4.Add optional enrichment (host criticality, AD group membership)
+5.Save processed logs to data/processed/clean_logs.csv
+
+Output: Clean CSV ready for feature engineering.
+
+step 1:
+Create synthetic log file using excel and saving it as csv file into /data/raw folder.
+
+step 2:
+create python ingestion script "src/ingestion/log_ingestion.py"
+
+The script will:
+
+1.Read CSV files from data/raw/
+2.Normalize timestamps to datetime objects
+3.Select required columns for the pipeline
+4.Save clean data to data/processed/clean_logs.csv
