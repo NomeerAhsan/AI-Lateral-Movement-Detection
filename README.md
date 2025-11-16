@@ -45,3 +45,22 @@ The script will:
 2.Normalize timestamps to datetime objects
 3.Select required columns for the pipeline
 4.Save clean data to data/processed/clean_logs.csv
+
+Phase 0: Step 2 - First Rule-Based Detection System.
+
+What is Rule-Based Detection?
+Using hard coded rules to detect suspicous activity.
+
+Example rule:
+Suspicous login outside working hours.
+Multiple logins to different hosts in short time (idicates lateral movement possibility)
+Remote process creation (powershell.exe)
+Access to sensitive hosts by uncommon users. ( HR server accessed by finance user)
+
+Step 1:
+Create a new script into "src/detection/rule_based_detection.py"
+Step 2:
+inputs -- data/processed/clean_logs.csv
+outputs -- data/alerts/alerts.csv
+step 3:
+run script from main folder.

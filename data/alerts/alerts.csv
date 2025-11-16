@@ -1,0 +1,6 @@
+timestamp,user,host,alert_type,details
+2025-11-16 09:10:00,ali,finance01,Multiple hosts in short time,User accessed hosts {'host001'} within 10 minutes
+2025-11-16 09:20:00,sara,hr01,Multiple hosts in short time,User accessed hosts {'host002'} within 10 minutes
+2025-11-16 09:05:00,ali,host001,Remote process creation,User ran powershell.exe: Invoke-Command
+2025-11-16 09:12:00,ali,finance01,Remote process creation,User ran cmd.exe: net use F$ \srv
+2025-11-16 09:20:00,sara,hr01,Remote process creation,User ran powershell.exe: Get-Process
